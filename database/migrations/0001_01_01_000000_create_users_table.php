@@ -21,11 +21,20 @@ return new class extends Migration
         });
 
          DB::table('users')->insert([
-            'name' => 'admin',
-            'email' => 'admin@gmail.com',
-            'password' => bcrypt('123'),
-            'created_at' => now(),
-            'updated_at' => now(),
+            [       
+                'name' => 'admin',
+                'email' => 'admin@gmail.com',
+                'password' => bcrypt('123'),
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'name' => 'dicky',
+                'email' => 'dicky@gmail.com',
+                'password' => bcrypt('123'),
+                'created_at' => now(),
+                'updated_at' => now()
+            ]
         ]);
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

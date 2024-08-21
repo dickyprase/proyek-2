@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Njxqlus\FilamentProgressbar\FilamentProgressbarPlugin;
 use App\Tables\Columns\ProgressColumn; 
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectResource extends Resource implements HasShieldPermissions
 {
@@ -24,29 +25,56 @@ class ProjectResource extends Resource implements HasShieldPermissions
 
     protected static ?string $navigationGroup = 'Management';
 
+    protected static ?int $navigationSort = 1;
+
     public static function form(Form $form): Form
     {
+        $isMandor = Auth::user()->hasRole('mandor');
+
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->disabled($isMandor),
+                Forms\Components\Select::make('user_id')
+                    ->required()
+                    ->relationship('user','name')
+                    ->label('User')
+                    ->disabled($isMandor),
                 Forms\Components\Textarea::make('description')
                     ->required()
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->disabled($isMandor),
                 Forms\Components\TextInput::make('budget')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->disabled($isMandor),
+                Forms\Components\TextInput::make('completion')
+                    ->required()
+                    ->numeric()
+                    ->minValue(1)
+                    ->maxValue(100)
+                    ->label('Proggress'),
                 Forms\Components\DatePicker::make('start_date')
-                    ->required(),
+                    ->required()
+                    ->disabled($isMandor),
                 Forms\Components\DatePicker::make('end_date')
-                    ->required(),
+                    ->required()
+                    ->disabled($isMandor),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                $isMandor = Auth::user()->hasRole('mandor');
+                if ($isMandor) {
+                    $userId = Auth::user()->id;
+                    $query->where('user_id', $userId);
+                }
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),

@@ -4,15 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Project extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'completion','budget', 'start_date', 'end_date'];
+    protected $fillable = ['name','user_id', 'description', 'completion','budget', 'start_date', 'end_date'];
 
-    public function material(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Material::class, 'material_id');
+        return $this->belongsTo(User::class)->whereHas('roles', function($query){
+            $query ->where('name', 'mandor');
+        });
     }
 }

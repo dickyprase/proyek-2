@@ -29,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->plugin(FilamentProgressbarPlugin::make()->color('#29b'))
-            ->brandName(env('APP_BRAND_NAME'))
+            ->brandName(env('APP_NAME'))
             ->colors([
                 'primary' => Color::Amber,
             ])

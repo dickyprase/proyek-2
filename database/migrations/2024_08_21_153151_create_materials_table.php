@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('materials', function (Blueprint $table) {            
             $table->id();
-            $table->unsignedBigInteger('project_id');
-            $table->foreign('project_id')->references('id')->on('projects');
+            $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
             $table->string('name');
             $table->text('description');
             $table->integer('quantity');
             $table->string('unit');
+            $table->boolean('is_delivered')->default(false);
             $table->timestamps();
         });
     }

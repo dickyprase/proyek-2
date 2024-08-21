@@ -13,6 +13,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Toggle;
 
 class MaterialResource extends Resource implements HasShieldPermissions
 {
@@ -22,40 +24,68 @@ class MaterialResource extends Resource implements HasShieldPermissions
 
     protected static ?string $navigationGroup = 'Management';
 
+    protected static ?int $navigationSort = 2;
+
     public static function form(Form $form): Form
     {
+        $isMandor = Auth::user()->hasRole('mandor');
+
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(255),
-                // Forms\Components\Select::make('project_id')
-                //     ->relationship('project_id', 'name')
-                //     ->preload()
-                //     ->searchable(),
+                    ->maxLength(255)
+                    ->disabled($isMandor),
+                Forms\Components\Select::make('project_id')
+                    ->relationship('project', 'name')
+                    ->required()
+                    ->disabled($isMandor),
                 Forms\Components\Textarea::make('description')
                     ->required()
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->disabled($isMandor),
                 Forms\Components\TextInput::make('quantity')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->disabled($isMandor),
                 Forms\Components\TextInput::make('unit')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->disabled($isMandor),
+                Toggle::make('is_delivered')
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->label('Delivered'),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                $isMandor = Auth::user()->hasRole('mandor');
+                if ($isMandor) {
+                    $userId = Auth::user()->id;
+            
+                    // Menggunakan join untuk memfilter materials berdasarkan project_id
+                    $query->whereHas('project', function (Builder $query) use ($userId) {
+                        $query->where('user_id', $userId);
+                    });
+                }
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('project.name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('quantity')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('unit')
                     ->searchable(),
+                Tables\Columns\IconColumn::make('is_delivered')
+                    ->boolean()
+                    ->label('Delivered'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

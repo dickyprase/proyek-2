@@ -18,4 +18,9 @@ class Project extends Model
             $query ->where('name', 'mandor');
         });
     }
+
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class);
+    }
 }

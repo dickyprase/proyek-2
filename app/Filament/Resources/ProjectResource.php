@@ -83,7 +83,6 @@ class ProjectResource extends Resource implements HasShieldPermissions
                     ->searchable()
                     ->alignCenter()
                     ->formatStateUsing(fn(string $state): string => __($state . '%')),
-                // ProgressColumn::make('completion'), 
                 Tables\Columns\TextColumn::make('budget')
                     ->numeric()
                     ->sortable()

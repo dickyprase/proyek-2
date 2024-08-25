@@ -13,8 +13,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 
-class ResponseRelationManager extends RelationManager
+class ResponseRelationManager extends RelationManager 
 {
     protected static string $relationship = 'Response';
 
@@ -22,11 +23,13 @@ class ResponseRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('complaint_id')
-                    ->relationship('complaint', 'title')
-                    ->required(),
+                // Forms\Components\Select::make('complaint_id')
+                //     ->relationship('complaint', 'title')
+                //     ->required(),
                 Forms\Components\Hidden::make('user_id')
                     ->default(Auth::user()->id),
+                Forms\Components\Hidden::make('complaint_id')
+                    ->default(request()->route()->parameter('record')),
                 Forms\Components\Textarea::make('response')
                     ->required()
                     ->columnSpanFull(),

@@ -12,8 +12,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 
-class ResponseResource extends Resource
+class ResponseResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Response::class;
 
@@ -83,4 +84,16 @@ class ResponseResource extends Resource
             'edit' => Pages\EditResponse::route('/{record}/edit'),
         ];
     }
+    
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any'
+        ];
+    } 
 }

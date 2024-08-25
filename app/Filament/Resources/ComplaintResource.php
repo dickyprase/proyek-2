@@ -6,6 +6,7 @@ use App\Filament\Resources\ComplaintResource\Pages;
 use App\Filament\Resources\ComplaintResource\RelationManagers;
 use App\Filament\Resources\ComplaintResource\RelationManagers\ResponseRelationManager;
 use App\Models\Complaint;
+use App\Models\Project;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,8 +14,10 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Illuminate\Support\Facades\Auth;
 
-class ComplaintResource extends Resource
+class ComplaintResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Complaint::class;
 
@@ -24,12 +27,21 @@ class ComplaintResource extends Resource
 
     public static function form(Form $form): Form
     {
+
+        $isDirektur = Auth::user()->hasRole('direktur');
+        $userId = Auth::user()->id;
         return $form
         ->schema([   
             Forms\Components\TextInput::make('title')
-                ->required(),
+                ->required()
+                ->disabled($isDirektur),
             Forms\Components\Textarea::make('description')
-                ->required(),
+                ->required()
+                ->disabled($isDirektur),
+            Forms\Components\Select::make('project_id')
+                ->relationship('project', 'name', modifyQueryUsing: fn (Builder $query) => $query->where('user_id', $userId))
+                ->required()
+                ->disabled($isDirektur),
             Forms\Components\Select::make('status')
                 ->options([
                     'open' => 'Open',
@@ -38,18 +50,31 @@ class ComplaintResource extends Resource
                     'closed' => 'Closed',
                 ])
                 ->default('open')
-                ->required(),
-            Forms\Components\Select::make('project_id')
-                ->relationship('project', 'name')
-                ->required(),
+                ->required()
+                ->hidden(Auth::user()->hasRole('mandor')),
+        
         ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+        ->modifyQueryUsing(function (Builder $query) {
+                $isMandor = Auth::user()->hasRole('mandor');
+                if ($isMandor) {
+                    $userId = Auth::user()->id;
+                    $query->where('user_id', $userId);
+                }
+            })
             ->columns([
+                Tables\Columns\TextColumn::make('title')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
+                    ->searchable()
+                    ->hidden(Auth::user()->hasRole('mandor')),
+                Tables\Columns\TextColumn::make('project.name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('description')
                     ->searchable(),
             ])
             ->filters([
@@ -80,4 +105,16 @@ class ComplaintResource extends Resource
             'edit' => Pages\EditComplaint::route('/{record}/edit'),
         ];
     }
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any'
+        ];
+    }   
 }

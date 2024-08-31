@@ -31,6 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->plugin(FilamentProgressbarPlugin::make()->color('#29b'))
             ->brandName(env('APP_NAME'))
+            ->brandLogo(asset('images/logo.png'))
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -43,6 +44,11 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 // Widgets\FilamentInfoWidget::class,
+            ])
+            ->navigationGroups([
+                'Ticketing',
+                'Management',
+                'Setting'
             ])
             ->middleware([
                 EncryptCookies::class,

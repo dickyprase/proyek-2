@@ -10,6 +10,8 @@ class EditTask extends EditRecord
 {
     protected static string $resource = TaskResource::class;
 
+    protected static ?string $title = 'Sub-Pekerjaan';
+
     protected function getHeaderActions(): array
     {
         return [

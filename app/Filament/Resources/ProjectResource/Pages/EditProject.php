@@ -10,6 +10,8 @@ class EditProject extends EditRecord
 {
     protected static string $resource = ProjectResource::class;
 
+    protected static ?string $title = 'Proyek';
+
     protected function getHeaderActions(): array
     {
         return [

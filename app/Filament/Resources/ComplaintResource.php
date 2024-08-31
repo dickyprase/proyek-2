@@ -24,6 +24,10 @@ class ComplaintResource extends Resource implements HasShieldPermissions
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Ticketing';
+    
+    protected static ?string $navigationLabel = 'Komplain';
+
+    protected static ?string $breadcrumb = "Komplain";
 
     public static function form(Form $form): Form
     {
@@ -34,24 +38,17 @@ class ComplaintResource extends Resource implements HasShieldPermissions
         ->schema([   
             Forms\Components\TextInput::make('title')
                 ->required()
+                ->label('Judul')
                 ->disabled($isDirektur),
             Forms\Components\Textarea::make('description')
                 ->required()
+                ->label('Deskripsi')
                 ->disabled($isDirektur),
             Forms\Components\Select::make('project_id')
-                ->relationship('project', 'name', modifyQueryUsing: fn (Builder $query) => $query->where('user_id', $userId))
+                ->relationship('project', 'name', modifyQueryUsing: fn (Builder $query) => $query->where('id', request()->route()->parameter('record')))
                 ->required()
+                ->label('Proyek')
                 ->disabled($isDirektur),
-            Forms\Components\Select::make('status')
-                ->options([
-                    'open' => 'Open',
-                    'in_progress' => 'In Progress',
-                    'resolved' => 'Resolved',
-                    'closed' => 'Closed',
-                ])
-                ->default('open')
-                ->required()
-                ->hidden(Auth::user()->hasRole('mandor')),
         
         ]);
     }
@@ -68,20 +65,27 @@ class ComplaintResource extends Resource implements HasShieldPermissions
             })
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->searchable(),
+                    ->searchable()
+                    ->label('Judul'),
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
                     ->hidden(Auth::user()->hasRole('mandor')),
                 Tables\Columns\TextColumn::make('project.name')
-                    ->searchable(),
+                    ->searchable()
+                    ->label('Proyek'),
                 Tables\Columns\TextColumn::make('description')
-                    ->searchable(),
+                    ->searchable()
+                    ->label('Deskripsi'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

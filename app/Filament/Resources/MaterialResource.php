@@ -24,7 +24,9 @@ class MaterialResource extends Resource implements HasShieldPermissions
 
     protected static ?string $navigationGroup = 'Management';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $navigationLabel = 'Material';
 
     public static function form(Form $form): Form
     {
@@ -35,15 +37,18 @@ class MaterialResource extends Resource implements HasShieldPermissions
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255)
-                    ->disabled($isMandor),
+                    ->disabled($isMandor)
+                    ->label('Nama Material'),
                 Forms\Components\Select::make('project_id')
                     ->relationship('project', 'name')
                     ->required()
-                    ->disabled($isMandor),
+                    ->disabled($isMandor)
+                    ->label('Proyek'),
                 Forms\Components\Textarea::make('description')
                     ->required()
                     ->columnSpanFull()
-                    ->disabled($isMandor),
+                    ->disabled($isMandor)
+                    ->label('Deskripsi'),
                 Forms\Components\TextInput::make('quantity')
                     ->required()
                     ->numeric()
@@ -75,9 +80,11 @@ class MaterialResource extends Resource implements HasShieldPermissions
             })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->label('Nama Material'),
                 Tables\Columns\TextColumn::make('project.name')
-                    ->searchable(),
+                    ->searchable()
+                    ->label('Proyek'),
                 Tables\Columns\TextColumn::make('quantity')
                     ->numeric()
                     ->sortable(),

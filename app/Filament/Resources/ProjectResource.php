@@ -27,6 +27,10 @@ class ProjectResource extends Resource implements HasShieldPermissions
 
     protected static ?int $navigationSort = 1;
 
+    protected static ?string $navigationLabel = 'Proyek';
+
+    protected static ?string $breadcrumb = "Proyek";
+
     public static function form(Form $form): Form
     {
         $isMandor = Auth::user()->hasRole('mandor');
@@ -36,26 +40,32 @@ class ProjectResource extends Resource implements HasShieldPermissions
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255)
+                    ->label('Nama Proyek')
                     ->disabled($isMandor),
                 Forms\Components\Select::make('user_id')
                     ->required()
                     ->relationship('user','name')
-                    ->label('User')
+                    ->label('Mandor')
                     ->disabled($isMandor),
                 Forms\Components\Textarea::make('description')
                     ->required()
+                    ->label('Deskripsi')
                     ->columnSpanFull()
                     ->disabled($isMandor),
                 Forms\Components\TextInput::make('budget')
                     ->required()
                     ->numeric()
+                    ->label('Anggaran')
                     ->disabled($isMandor),
-                Forms\Components\TextInput::make('completion')
+
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'in_progress' => 'In Proggress',
+                        'completed' => 'Completed',
+                    ])
                     ->required()
-                    ->numeric()
-                    ->minValue(1)
-                    ->maxValue(100)
-                    ->label('Proggress'),
+                    ->disabled($isMandor),
                 Forms\Components\DatePicker::make('start_date')
                     ->required()
                     ->disabled($isMandor),
@@ -77,23 +87,23 @@ class ProjectResource extends Resource implements HasShieldPermissions
             })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('completion')
-                    ->label('Proggress')
                     ->searchable()
-                    ->alignCenter()
-                    ->formatStateUsing(fn(string $state): string => __($state . '%')),
+                    ->label('Nama'),
+                Tables\Columns\TextColumn::make('status'),
                 Tables\Columns\TextColumn::make('budget')
                     ->numeric()
                     ->sortable()
+                    ->label('Anggaran')
                     ->alignCenter()
                     ->money('Rp.', true),
                 Tables\Columns\TextColumn::make('start_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('Tgl. Dimulai'),
                 Tables\Columns\TextColumn::make('end_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('Tgl. Selesai'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

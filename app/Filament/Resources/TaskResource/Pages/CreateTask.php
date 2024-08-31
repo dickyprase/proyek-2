@@ -9,4 +9,11 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateTask extends CreateRecord
 {
     protected static string $resource = TaskResource::class;
+
+    protected static ?string $title = 'Sub-Pekerjaan';
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

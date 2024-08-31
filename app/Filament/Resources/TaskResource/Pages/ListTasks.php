@@ -10,10 +10,13 @@ class ListTasks extends ListRecords
 {
     protected static string $resource = TaskResource::class;
 
+    protected static ?string $title = 'Sub-Pekerjaan';
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+            ->label('Tambah'),
         ];
     }
 }

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Columns\ImageColumn;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Illuminate\Support\Facades\Auth;
+use App\Tables\Columns\ProgressColumn; 
 
 class TaskResource extends Resource implements HasShieldPermissions
 {
@@ -24,35 +25,45 @@ class TaskResource extends Resource implements HasShieldPermissions
 
     protected static ?string $navigationGroup = 'Management';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $navigationLabel = 'Sub-Pekerjaan';
+
+    protected static ?string $breadcrumb = "Sub-Pekerjaan";
 
     public static function form(Form $form): Form
     {
+        $isAdmin = Auth::user()->hasRole('super_admin');
         return $form
             ->schema([
                 Forms\Components\Select::make('project_id')
                     ->relationship('project', 'name')
-                    ->required(),
+                    ->required()
+                    ->label('Nama Proyek'),
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->label('Nama Sub-Pekerjaan'),
                 Forms\Components\Textarea::make('description')
                     ->required()
-                    ->columnSpanFull(),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'in_progress' => 'In Proggress',
-                        'completed' => 'Completed',
-                    ])
-                    ->required(),
+                    ->columnSpanFull()
+                    ->label('Deskripsi'),
+                Forms\Components\TextInput::make('completion')
+                    ->required()
+                    ->numeric()
+                    ->minValue(0)
+                    ->maxValue(100)
+                    ->label('Proggress')
+                    ->default('0')
+                    ->hidden($isAdmin),
                 Forms\Components\DatePicker::make('start_date')
                     ->required(),
                 Forms\Components\DatePicker::make('end_date')
                     ->required(),
                 Forms\Components\FileUpload::make('image')
                     ->directory('task')
-                    ->image(),
+                    ->image()
+                    ->hidden($isAdmin),
             ]);
     }
 
@@ -71,17 +82,25 @@ class TaskResource extends Resource implements HasShieldPermissions
             })
             ->columns([
                 Tables\Columns\TextColumn::make('project.name')
-                    ->searchable(),
+                    ->searchable()
+                    ->label('Nama Proyek'),
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('status'),
+                    ->searchable()
+                    ->label('Nama'),
+                // Tables\Columns\TextColumn::make('completion')
+                //     ->label('Proggress')
+                //     ->searchable()
+                //     ->alignCenter()
+                //     ->formatStateUsing(fn(string $state): string => __($state . '%')),
+                ProgressColumn::make('completion'), 
                 Tables\Columns\TextColumn::make('start_date')
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('end_date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('image'),
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('Dokumentasi'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

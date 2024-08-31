@@ -9,11 +9,14 @@ use Filament\Resources\Pages\ListRecords;
 class ListComplaints extends ListRecords
 {
     protected static string $resource = ComplaintResource::class;
+    
+    protected static ?string $title = 'Komplain';
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+            ->label('Tambah'),
         ];
     }
 }

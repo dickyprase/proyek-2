@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
             $table->string('title');
             $table->text('description');
-            $table->enum('status', ['open', 'in_progress', 'resolved', 'closed'])->default('open');
             $table->timestamps();
         });
     }

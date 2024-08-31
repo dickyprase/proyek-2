@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('name');
             $table->text('description');
-            $table->integer('completion')->default(0);
+            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
             $table->integer('budget');
             $table->date('start_date');
             $table->date('end_date');

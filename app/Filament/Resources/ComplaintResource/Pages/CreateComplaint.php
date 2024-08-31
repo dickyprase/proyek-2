@@ -11,6 +11,8 @@ class CreateComplaint extends CreateRecord
 {
     protected static string $resource = ComplaintResource::class;
 
+    protected static ?string $title = 'Komplain';
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $userId = Auth::user()->id;

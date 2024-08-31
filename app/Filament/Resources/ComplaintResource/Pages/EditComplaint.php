@@ -10,6 +10,8 @@ class EditComplaint extends EditRecord
 {
     protected static string $resource = ComplaintResource::class;
 
+    protected static ?string $title = 'Komplain';
+
     protected function getHeaderActions(): array
     {
         return [
